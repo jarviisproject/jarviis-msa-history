@@ -15,7 +15,9 @@ class Weather(object):
 
     def process(self):
         vo = ValueObject()
-        self.search_old(vo)
+        # self.search_old(vo)
+        # self.search_now(vo)
+
 
     def search_now(self, vo):
         vo.context = 'admin/weather/data/'
@@ -29,11 +31,12 @@ class Weather(object):
         search.send_keys("동작구")
         time.sleep(3)
         driver.find_element_by_css_selector("#index-local-search > div.cmp-local-search-items.on.opened.places > ul > li:nth-child(1) > a").click()
-        self.crawling(driver)
+        self.crawling_now(driver)
 
     def crawling_now(self, driver):
         soup = BeautifulSoup(driver.page_source, 'html.parser')
-        weather = soup.find('span', {'class':'wic DB05 large'}).string
+        # weather = soup.find('span', {'class':'wic DB05 large'}).string
+        weather = soup.find('span', {'class':'wic DB05'}).string
         location = soup.find_all('div', {'class':'serch-area accordionsecond-wrap'})
         driver.close()
         print(location)

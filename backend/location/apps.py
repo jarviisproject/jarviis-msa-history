@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class DeptConfig(AppConfig):
+class LocationConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'admin.dept'
+    name = 'location'
