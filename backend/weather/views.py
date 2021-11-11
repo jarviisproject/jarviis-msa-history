@@ -4,11 +4,11 @@ from django.http import JsonResponse
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import JSONParser
 
-from location.models import Location
+from weather.models import Weather
 
 
 @api_view(['GET', 'POST'])
 @parser_classes([JSONParser])
 def process(request):
-    Location().process()
-    return JsonResponse({'Location': 'SUCCESS'})
+    Weather().process()
+    return JsonResponse({'Weather': 'SUCCESS'})
