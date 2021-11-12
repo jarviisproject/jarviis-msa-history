@@ -21,5 +21,6 @@ urlpatterns = [
     path('api/connect/', include('common.urls')),
     path('api/weather/', include('weather.urls')),
     path('api/location/', include('location.urls')),
+    path('api/logdata/', include('logdata.urls')),
 
 ]

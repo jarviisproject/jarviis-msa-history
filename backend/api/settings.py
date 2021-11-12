@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'user',
     'weather',
     'location',
+    'logdata',
     'rest_framework',
     'corsheaders',
     'django.contrib.admin',

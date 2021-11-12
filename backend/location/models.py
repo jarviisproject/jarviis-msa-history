@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 
 
-
 class Location(object):
     def __init__(self):
         pass
@@ -35,6 +34,7 @@ class Location(object):
         # [print(i.find('strong').text) for i in location]
         with open(f'{vo.context}location_data.csv', 'w', encoding='UTF-8') as f:
             w = csv.writer(f)
+            w.writerow(['location','category','address'])
             for i in ls:
                 w.writerow(i)
 
