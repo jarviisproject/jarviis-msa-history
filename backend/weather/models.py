@@ -94,15 +94,3 @@ class Weather(object):
         print(ls3)
         dict = {h+i[0]:i[j+1] for j, h in enumerate(month) for i in ls3}
         print(dict)
-
-
-
-
-
-
-
-
-
-
-
-
