@@ -8,27 +8,27 @@ from selenium import webdriver
 
 class Weather(object):
     def __init__(self):
-        pass
+        self.driver = webdriver.Chrome('common/data/chromedriver.exe')
 
     def process(self):
         vo = ValueObject()
         # self.search_old(vo)
-        self.search_now(vo)
+        return self.search_now(vo)
 
 
     def search_now(self, vo):
         vo.context = 'api/weather/data/'
         vo.url = 'https://www.weather.go.kr/w/index.do#'
-        driver = webdriver.Chrome('common/data/chromedriver.exe')
+        driver = self.driver
         driver.maximize_window()
         driver.get(vo.url)
-        time.sleep(3)
+        time.sleep(1)
         search = driver.find_element_by_class_name('input')
         search.clear()
-        search.send_keys("동작구")
-        time.sleep(3)
+        search.send_keys("강남구")
+        time.sleep(1)
         driver.find_element_by_css_selector("#index-local-search > div.cmp-local-search-items.on.opened.places > ul > li:nth-child(1) > a").click()
-        self.crawling_now(driver)
+        return self.crawling_now(driver)
 
     def crawling_now(self, driver):
         soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -36,8 +36,9 @@ class Weather(object):
         weather = soup.find('span', {'class':'wic DB05'}).string
         location = soup.find_all('div', {'class':'serch-area accordionsecond-wrap'})
         driver.close()
-        print(location)
-        print(weather)
+        # print(location)
+        # print(weather)
+        return weather
 
     def search_old(self, vo):
         vo.context = 'api/weather/data/'
