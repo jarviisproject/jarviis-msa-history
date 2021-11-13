@@ -33,12 +33,14 @@ class Weather(object):
     def crawling_now(self, driver):
         soup = BeautifulSoup(driver.page_source, 'html.parser')
         # weather = soup.find('span', {'class':'wic DB05 large'}).string
-        weather = soup.find('span', {'class':'wic DB05'}).string
-        location = soup.find_all('div', {'class':'serch-area accordionsecond-wrap'})
+        crawling = soup.find('div', {'class':'item-wrap'})
+        # location = soup.find_all('div', {'class':'serch-area accordionsecond-wrap'})
         driver.close()
-        # print(location)
-        # print(weather)
-        return weather
+        ls = []
+        [ls.append(i) for i in crawling.find('ul')]
+        weather = str(ls[3]).split('>')
+        weather = weather[4].split('<')
+        return weather[0]
 
     def search_old(self, vo):
         vo.context = 'api/weather/data/'
