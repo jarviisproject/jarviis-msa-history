@@ -17,10 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    # path('api/', api.site.urls),
-    path('api/connect/', include('common.urls')),
-    path('api/weather/', include('weather.urls')),
-    path('api/location/', include('location.urls')),
-    path('api/logdata/', include('logdata.urls')),
-
+    # path('admin/', admin.site.urls),
+    path('api/history', include('userlog.urls')),
+    path('api/weather', include('weather.urls')),
+    path('api/location', include('location.urls')),
+    path('api/diary', include('diary.urls')),
 ]
