@@ -21,5 +21,4 @@ urlpatterns = [
     path('api/history', include('userlog.urls')),
     path('api/weather', include('weather.urls')),
     path('api/location', include('location.urls')),
-    path('api/diary', include('diary.urls')),
 ]

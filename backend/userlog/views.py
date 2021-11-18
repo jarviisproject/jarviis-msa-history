@@ -17,6 +17,7 @@ from userlog.models import UserLog
 from userlog.models_data import DbUploader
 from userlog.models_process import LogData
 from userlog.serializers import UserLogSerializer
+from weather.models import Weather
 
 
 @api_view(['GET'])
@@ -100,8 +101,8 @@ def create(request):
                            address=new['address'],
                            x=new['x'],
                            y=new['y'],
-                           log_date=new['log_date'],
-                           weather=new['weather'],
+                           log_date=new['log_date'] if new['log_date'] != "" else datetime.now(),
+                           weather=new['weather'] if new['weather'] != "" else Weather().process(),
                            log_type=new['log_type'],
                            contents=new['contents'],
                            item=new['item'],
