@@ -6,7 +6,6 @@ from django.db import models
 
 
 class UserLog(models.Model):
-    # use_in_migrations = True
     location = models.TextField()
     address = models.TextField()
     x = models.TextField()
@@ -19,7 +18,6 @@ class UserLog(models.Model):
     user_id = models.IntegerField()
 
     class Meta:
-        # managed = True
         db_table = 'userlog'
 
     def __str__(self):
