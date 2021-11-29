@@ -1,4 +1,6 @@
+import datetime as dt
 from datetime import datetime
+
 import requests
 
 # Create your tests here.
@@ -9,15 +11,83 @@ class Weather(object):
         pass
 
     def process(self):
-        return self.weather_api()
+        return self.weather_now()
+
+    def weather_now(self):
+        base_date, base_time, nx, ny = self.weather_api()
+        url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst'
+        params = {
+            'serviceKey': 'Azs8t5lc5MVlv67BnCCXpwjGc9eLdowYV2q3MZO0wqwOkWo3vpUP0PsHimKL0osXusxlIb+888C2E+PquYdixQ==',
+            'pageNo': '1',
+            'numOfRows': '10',
+            'dataType': 'JSON',
+            'base_date': base_date,
+            'base_time': base_time,
+            'nx': f'{nx}',
+            'ny': f'{ny}'}
+        response = requests.get(url, params=params)
+        weather = response.json().get('response').get('body').get('items')
+        weather = list(weather.values())[0]
+        for i in weather:
+            if i['category'] == 'SKY':
+                sky = i
+            elif i['category'] == 'PTY':
+                pty = i
+        # print(f'SKY dict : {sky}')
+        # print(f'PTY dict : {pty}')
+        # print(f'SKY result : {sky["fcstValue"]}')
+        # print(f'PTY result : {pty["fcstValue"]}')
+        return self.weather_transfer(sky,pty)
+
+    def weather_pre(self):
+        base_date, base_time, nx, ny = self.weather_api()
+        url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst'
+        params = {
+            'serviceKey': 'Azs8t5lc5MVlv67BnCCXpwjGc9eLdowYV2q3MZO0wqwOkWo3vpUP0PsHimKL0osXusxlIb+888C2E+PquYdixQ==',
+            'pageNo': '1',
+            'numOfRows': '1000',
+            'dataType': 'JSON',
+            'base_date': base_date,
+            'base_time': base_time,
+            'nx': f'{nx}',
+            'ny': f'{ny}'}
+        response = requests.get(url, params=params)
+        # print(response.url)
+        weather = response.json().get('response').get('body').get('items')
+        weather = list(weather.values())[0]
+        time = str((int(base_time) + 100)) if int(base_time) + 100 < 2400 else "0000"
+        time = time if len(time) == 4 else f'0{time}'
+        day = [base_date, self.date_string(datetime.now() + dt.timedelta(days=1)), self.date_string(datetime.now() + dt.timedelta(days=2))]
+        sky, pty = [], []
+        for i in weather:
+            if i['fcstDate'] == base_date and i['fcstTime'] == time:
+                if i['category'] == 'SKY':
+                    sky.append(i)
+                elif i['category'] == 'PTY':
+                    pty.append(i)
+            elif i['fcstDate'] == day[1] and i['fcstTime'] == time:
+                if i['category'] == 'SKY':
+                    sky.append(i)
+                elif i['category'] == 'PTY':
+                    pty.append(i)
+            elif i['fcstDate'] == day[2] and i['fcstTime'] == time:
+                if i['category'] == 'SKY':
+                    sky.append(i)
+                elif i['category'] == 'PTY':
+                    pty.append(i)
+        result = [self.weather_transfer(sky[i], pty[i]) for i in range(len(sky))]
+        return {j : result[i] for i, j in enumerate(day)}
 
     def weather_api(self):
         # 강남구 위경도
-        nx = 61
-        ny = 126
+        # nx = 61
+        # ny = 126
+        # 서울 경도
+        nx = 60
+        ny = 127
         # 현재 시간
         now = datetime.now()
-        base_date = f'{now.year}{now.month if now.month>9 else f"0{now.month}"}{now.day if now.day>9 else f"0{now.day}"}'
+        base_date = self.date_string(now)
         # 1일 총 8번 데이터가 업데이트 된다.(0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300)
         # 현재 api를 가져오려는 시점의 이전 시각에 업데이트된 데이터를 base_time, base_date로 설정
         if now.hour < 2 or (now.hour == 2 and now.minute <= 10):  # 0시~2시 10분 사이
@@ -38,28 +108,14 @@ class Weather(object):
             base_time = "2000"
         else:  # 23시 11분~23시 59분
             base_time = "2300"
-        url = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst'
-        params = {'serviceKey': 'Azs8t5lc5MVlv67BnCCXpwjGc9eLdowYV2q3MZO0wqwOkWo3vpUP0PsHimKL0osXusxlIb+888C2E+PquYdixQ==',
-                  'pageNo': '1',
-                  'numOfRows': '10',
-                  'dataType': 'JSON',
-                  'base_date': base_date,
-                  'base_time': base_time,
-                  'nx': f'{nx}',
-                  'ny': f'{ny}'}
-        response = requests.get(url, params=params)
-        weather = response.json().get('response').get('body').get('items')
-        weather = list(weather.values())[0]
-        for i in weather:
-            if i['category'] == 'SKY':
-                sky = i
-            elif i['category'] == 'PTY':
-                pty = i
-        # print(f'SKY dict : {sky}')
-        # print(f'PTY dict : {pty}')
-        # print(f'SKY result : {sky["fcstValue"]}')
-        # print(f'PTY result : {pty["fcstValue"]}')
-        return self.sky_transfer(sky["fcstValue"]) if self.pty_transfer(pty["fcstValue"]) == '0' else self.pty_transfer(pty["fcstValue"])
+        return base_date, base_time, nx, ny
+
+    def date_string(self, date):
+        return f'{date.year}{date.month if date.month > 9 else f"0{date.month}"}{date.day if date.day > 9 else f"0{date.day}"}'
+
+    def weather_transfer(self, sky, pty):
+        return self.sky_transfer(sky["fcstValue"]) if self.pty_transfer(pty["fcstValue"]) == '0' else self.pty_transfer(
+            pty["fcstValue"])
 
     # 하늘상태(SKY) 코드 : 맑음(1), 구름많음(3), 흐림(4)
     def sky_transfer(self, sky):
@@ -87,3 +143,7 @@ class Weather(object):
         else:
             return '데이터 없음'
 
+
+if __name__ == '__main__':
+    w = Weather()
+    print(w.weather_pre())

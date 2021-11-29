@@ -9,6 +9,12 @@ from weather.models import Weather
 
 @api_view(['GET', 'POST'])
 @parser_classes([JSONParser])
-def process(request):
+def weather_test(request):
     Weather().process()
-    return JsonResponse({'Weather': 'SUCCESS'})
+    return JsonResponse({'Weather TEST': 'SUCCESS'})
+
+@api_view(['GET', 'POST'])
+@parser_classes([JSONParser])
+def process(request):
+    # Weather().weather_pre()
+    return JsonResponse(Weather().weather_pre())
